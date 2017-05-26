@@ -1,14 +1,18 @@
 package com.cdfortis.udpecho;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.StrictMode;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
@@ -26,6 +30,7 @@ import java.io.IOException;
 public class MainActivity extends Activity implements TextView.OnEditorActionListener {
 
 
+    private static final String TAG = "MainActivity";
     private EditText textIp, textPort, textSpeed, textSize, textTag;
     private TextView textLogFilePath;
     private Button btnStart, btnStop;
@@ -98,6 +103,17 @@ public class MainActivity extends Activity implements TextView.OnEditorActionLis
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
                 .permitAll().build();
         StrictMode.setThreadPolicy(policy);
+
+
+    }
+
+    private String getNetInfo(){
+        ConnectivityManager connectivity = (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (connectivity != null) {
+            NetworkInfo activeNetInfo = connectivity.getActiveNetworkInfo();
+            return activeNetInfo.toString();
+        }
+        return "";
     }
 
     private void openLog() {
@@ -191,6 +207,7 @@ public class MainActivity extends Activity implements TextView.OnEditorActionLis
             btnStart.setEnabled(false);
             handler.postDelayed(runnableStopSend, 60 * 1000);
             showToast("已启动,请等待1分钟出结果");
+            echo.debug("当前网络：%s",getNetInfo());
         } else {
             showToast("启动失败,请查看日志");
             echo = null;

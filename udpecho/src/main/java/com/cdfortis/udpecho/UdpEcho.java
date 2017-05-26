@@ -12,9 +12,11 @@ import java.io.UnsupportedEncodingException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.TreeMap;
 
 
 /**
@@ -243,7 +245,13 @@ public class UdpEcho {
             debug("丢包数量:%d,丢包流量:%d" ,lastCount,lastSize);
             debug("丢包数量百分比:%.2f%%,丢包流量百分比:%.2f%%" ,lastCountPercent , lastSizePercent);
 
-            Map<Pair<Long,Long>,Integer> times = new HashMap<>();
+            Map<Pair<Long,Long>,Integer> times = new TreeMap<>(new Comparator<Pair<Long,Long>>(){
+
+                @Override
+                public int compare(Pair<Long, Long> o1, Pair<Long, Long> o2) {
+                    return (int)(o1.first-o2.first);
+                }
+            });
             times.put(new Pair<>(0L, 10L),0);
             times.put(new Pair<>(10L, 20L),0);
             times.put(new Pair<>(20L, 50L),0);
@@ -308,7 +316,7 @@ public class UdpEcho {
         }
     }
 
-    private void debug(String format, Object... args) {
+    public void debug(String format, Object... args) {
         writeLog(0, format, args);
     }
 
